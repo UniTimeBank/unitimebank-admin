@@ -30,7 +30,7 @@ export const moderationApi = baseApi.injectEndpoints({
     }),
     adjustTrustScore: builder.mutation<
       { success: boolean; message: string },
-      { userId: string; delta: number; note?: string }
+      { userId: string; delta: number; roleType?: 'MENTOR' | 'LEARNER'; note?: string }
     >({
       query: (body) => ({
         url: '/moderation/admin/adjust-trust-score',

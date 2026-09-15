@@ -35,6 +35,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 }) => {
   const [isAdjusting, setIsAdjusting] = useState(false);
   const [deltaPoints, setDeltaPoints] = useState<number>(5);
+  const [roleType, setRoleType] = useState<'MENTOR' | 'LEARNER'>('MENTOR');
   const [adjustNote, setAdjustNote] = useState('');
 
   const [adjustTrustScore, { isLoading: isSavingAdjust }] = useAdjustTrustScoreMutation();
@@ -59,11 +60,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
       await adjustTrustScore({
         userId: targetUserId,
         delta: Number(deltaPoints),
+        roleType,
         note: adjustNote || 'Quản trị viên điều chỉnh thủ công',
       }).unwrap();
 
       toast.success(
-        `Đã điều chỉnh ${deltaPoints > 0 ? `+${deltaPoints}` : deltaPoints} điểm uy tín thành công!`
+        `Đã điều chỉnh ${deltaPoints > 0 ? `+${deltaPoints}` : deltaPoints} điểm uy tín (${roleType === 'MENTOR' ? 'Người Dạy' : 'Người Học'}) thành công!`
       );
       setIsAdjusting(false);
       setAdjustNote('');
@@ -150,7 +152,21 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
               </h4>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-teal-900 mb-1">
+                  Vai trò điều chỉnh
+                </label>
+                <select
+                  value={roleType}
+                  onChange={(e) => setRoleType(e.target.value as 'MENTOR' | 'LEARNER')}
+                  className="w-full px-3 py-2 rounded-xl bg-white border border-teal-200 text-xs text-slate-900 font-bold focus:outline-none focus:border-teal-600"
+                >
+                  <option value="MENTOR">Người Dạy</option>
+                  <option value="LEARNER">Người Học</option>
+                </select>
+              </div>
+
               <div>
                 <label className="block text-[11px] font-semibold text-teal-900 mb-1">
                   Số điểm thay đổi (+/-)

@@ -66,9 +66,12 @@ export interface GetReportsResponse {
 
 export interface ResolveReportDto {
   reportId: string;
-  decision: ModerationDecisionType;
+  decision?: ModerationDecisionType;
+  decisionType?: string;
   adminNotes?: string;
+  note?: string;
   trustScorePenalty?: number;
+  targetRole?: 'MENTOR' | 'LEARNER' | 'ALL';
   creditPenalty?: number;
   suspendDays?: number;
 }

@@ -23,6 +23,7 @@ export const ResolveReportModal: React.FC<ResolveReportModalProps> = ({
 }) => {
   const [decision, setDecision] = useState<ModerationDecisionType>('WARNING');
   const [trustScorePenalty, setTrustScorePenalty] = useState<number>(10);
+  const [targetRole, setTargetRole] = useState<'MENTOR' | 'LEARNER' | 'ALL'>('MENTOR');
   const [creditPenalty, setCreditPenalty] = useState<number>(0);
   const [adminNotes, setAdminNotes] = useState<string>('');
 
@@ -37,9 +38,12 @@ export const ResolveReportModal: React.FC<ResolveReportModalProps> = ({
       await resolveReport({
         reportId: report.id,
         decision,
+        decisionType: decision,
         trustScorePenalty: decision === 'DEDUCT_TRUST_SCORE' || decision === 'BAN_PERMANENT' ? trustScorePenalty : 0,
+        targetRole: decision === 'DEDUCT_TRUST_SCORE' || decision === 'BAN_PERMANENT' ? targetRole : undefined,
         creditPenalty: decision === 'DEDUCT_CREDIT' ? creditPenalty : 0,
         adminNotes: adminNotes.trim() || undefined,
+        note: adminNotes.trim() || undefined,
       }).unwrap();
 
       toast.success('Đã thực thi quyết định xử lý báo cáo vi phạm thành công!');
@@ -80,20 +84,65 @@ export const ResolveReportModal: React.FC<ResolveReportModalProps> = ({
 
         {/* Penalty inputs if applicable */}
         {(decision === 'DEDUCT_TRUST_SCORE' || decision === 'BAN_PERMANENT') && (
-          <div className="animate-in fade-in duration-200">
-            <label className="block text-[11px] font-bold text-rose-700 mb-1 uppercase tracking-wider">
-              Số Điểm Uy Tín Bị Trừ
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                min="1"
-                max="100"
-                value={trustScorePenalty}
-                onChange={(e) => setTrustScorePenalty(Number(e.target.value))}
-                className="w-32 px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold focus:outline-none focus:bg-white focus:border-teal-600"
-              />
-              <span className="text-xs text-slate-500">Điểm uy tín sẽ bị trừ ngay sau khi duyệt.</span>
+          <div className="space-y-3 p-3.5 rounded-2xl bg-rose-50/60 border border-rose-200/80 animate-in fade-in duration-200">
+            <div>
+              <label className="block text-[11px] font-bold text-rose-800 mb-1 uppercase tracking-wider">
+                Vai Trò Bị Trừ Điểm Uy Tín
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTargetRole('MENTOR')}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                    targetRole === 'MENTOR'
+                      ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  Người Dạy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTargetRole('LEARNER')}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                    targetRole === 'LEARNER'
+                      ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  Người Học
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTargetRole('ALL')}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
+                    targetRole === 'ALL'
+                      ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  Cả Hai Vai Trò
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-bold text-rose-800 mb-1 uppercase tracking-wider">
+                Số Điểm Uy Tín Bị Trừ (0 - 100)
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={trustScorePenalty}
+                  onChange={(e) => setTrustScorePenalty(Number(e.target.value))}
+                  className="w-32 px-3.5 py-2 rounded-xl bg-white border border-rose-300 text-slate-900 text-xs font-bold focus:outline-none focus:border-rose-600"
+                />
+                <span className="text-xs text-rose-700 font-medium">
+                  Điểm uy tín sẽ bị trừ trực tiếp sau khi duyệt.
+                </span>
+              </div>
             </div>
           </div>
         )}
